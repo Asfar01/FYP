@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Login from './Components/Login';
+import Signup from './Components/Signup';
 // import Regular from './components/regular';
 // import Special from './components/special';
 import Home from './Components/Home';
@@ -26,6 +27,9 @@ class App extends Component {
               <li>
                 <Link to="/">Home</Link>
               </li>
+              <li>
+                <Link to="/Signup">Signup</Link>
+              </li>
               {/* <li>
                 <Link to="/tip/regular">Regular Tips</Link>
               </li> */}
@@ -48,6 +52,7 @@ class App extends Component {
         {/* <Route exact path="/tip/regular" component={Regular} />
         <Route exact path="/tip/Special" component={Special} /> */}
         <Route exact path="/login" component={Login} />
+        <Route exact path="/signup" component={Signup} />
       </div>
       </Router>
     );
