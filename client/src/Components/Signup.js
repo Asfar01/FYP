@@ -9,8 +9,8 @@ class Signup extends Component {
         this.state = {
 
 
-            firstname: '',
-            lastname: '',
+            firstName: '',
+            lastName: '',
             phone: '',
             email: '',
             username: '',
@@ -31,8 +31,12 @@ class Signup extends Component {
     send() {
         // event.preventDefault();
         const signupdata = {
-            firstname: this.statefirstname,
-            lastname: this.state.lastname,
+            firstName: this.state.firstName,
+            lastName: this.state.lastName,
+            // name: {
+            //     firstname: this.statefirstname,
+            //     lastname: this.state.lastname,
+            // },
             phone: this.state.phone,
 
             email: this.state.email,
@@ -41,15 +45,15 @@ class Signup extends Component {
         }
         axios.post('http://localhost:4000/api/v1/auth/signup', signupdata)
             .then(response => response.data)
-
+        console.log('send hit hora : ', signupdata)
     }
     render() {
 
         return (
             <div>
                 <form>
-                    <input type="text" placeholder="firstname" value={this.state.firstname} name="firstname" onChange={this.handleClick} />
-                    <input type="text" placeholder="lastname" value={this.state.lastname} name="lastname" onChange={this.handleClick} />
+                    <input type="text" placeholder="firstname" value={this.state.firstName} name="firstName" onChange={this.handleClick} />
+                    <input type="text" placeholder="lastname" value={this.state.lastName} name="lastName" onChange={this.handleClick} />
                     <input type="text" placeholder="phone" value={this.state.phone} name="phone" onChange={this.handleClick} />
 
 
@@ -59,7 +63,7 @@ class Signup extends Component {
                     <input type="password" placeholder="Password" value={this.state.password} name="password" onChange={this.handleClick} />
 
 
-                    <input onClick={this.send} type="submit" />
+                    <input onClick={this.send} type="button" value="Submit" />
                 </form>
             </div>
 

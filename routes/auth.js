@@ -30,7 +30,7 @@ router.post('/signup', async (req, res, next) => {
 	try {
 		const { firstName, lastName, phone, email, username, password } = req.body;
 		let hashedPassword;
-
+		console.log('firstname is : ', firstName)
 		let userEmail = await User.findOne({ email });
 		if (userEmail) return res.status(409).send("This email already exists");
 

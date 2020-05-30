@@ -17,8 +17,15 @@ router.post("/:id/upBench", async (req, res) => {
 });
 
 /* GET users listing. */
-router.get("/", function (req, res, next) {
-  res.send("<h1>User Api's</h1>");
+router.get("/", async (req, res) => {
+  try {
+    const user = await User.find().sort({ date: -1 });
+
+    res.status(200).send(user);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send(err.message);
+  }
 });
 
 module.exports = router;
