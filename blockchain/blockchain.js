@@ -1,37 +1,45 @@
 const CryptoJS = require('crypto-js');
 const currentNodeUrl = process.argv[3];
 const { v1: uuidv1 } = require('uuid');
+const { Sikay } = require('../models/Sikay');
 
-function Blockchain(){
+
+function Blockchain() {
     this.chain = [];
     this.pendingTransactions = [];
 
     this.currentNodeUrl = currentNodeUrl;
     this.networkNodes = [];
 
-    this.createNewBlock(100,null,this.calculateHash(null, 100, this.transactions));
+    const genesisBlock = this.createNewBlock(100, null, this.calculateHash(null, 100, this.transactions));
+    const index = genesisBlock.index;
+    let genesisIndex = Sikay.findOne({ index });
+    console.log(index);
+    if (!genesisIndex) {
+        block = new Sikay({ index: genesisBlock.index, timestamp: genesisBlock.timestamp, transactions: genesisBlock.transactions, nonce: genesisBlock.nonce, hash: genesisBlock.hash, previousHash: genesisBlock.previousBlockHash });
+        block.save();
+    }
 }
 
-Blockchain.prototype.createNewBlock = function(nonce, previousBlockHash, hash) {
+Blockchain.prototype.createNewBlock = function (nonce, previousBlockHash, hash) {
     const newBlock = {
-        index: this.chain.length +1,
+        index: this.chain.length + 1,
         timestamp: Date.now(),
         transactions: this.pendingTransactions,
         nonce: nonce,
         hash: hash,
         previousBlockHash: previousBlockHash
     };
-
     this.pendingTransactions = [];
     this.chain.push(newBlock);
     return newBlock;
 };
 
-Blockchain.prototype.getLastBlock = function() {
+Blockchain.prototype.getLastBlock = function () {
     return this.chain[this.chain.length - 1];
 };
 
-Blockchain.prototype.createNewTransaction = function(amount, sender, recipient) {
+Blockchain.prototype.createNewTransaction = function (amount, sender, recipient) {
     const newTransaction = {
         amount: amount,
         sender: sender,
@@ -43,39 +51,39 @@ Blockchain.prototype.createNewTransaction = function(amount, sender, recipient) 
     return newTransaction;
 };
 
-Blockchain.prototype.addTransactionsToPendingTxs = function(transactionObj){
+Blockchain.prototype.addTransactionsToPendingTxs = function (transactionObj) {
     this.pendingTransactions.push(transactionObj);
     return this.getLastBlock().index + 1;
 };
 
 
-Blockchain.prototype.calculateHash = function(previousBlockHash, nonce, currentBlockData){
-    const dataString = (previousBlockHash + nonce + JSON.stringify(currentBlockData)).toString();   
+Blockchain.prototype.calculateHash = function (previousBlockHash, nonce, currentBlockData) {
+    const dataString = (previousBlockHash + nonce + JSON.stringify(currentBlockData)).toString();
     let hash = CryptoJS.SHA256(dataString).toString(CryptoJS.enc.Hex);
     return hash;
 };
 
 //Proof of work is a mining concept used to mine blocks
-Blockchain.prototype.proofOfWork = function(previousBlockHash, currentBlockData){
+Blockchain.prototype.proofOfWork = function (previousBlockHash, currentBlockData) {
     let nonce = 0;
     let hash = this.calculateHash(previousBlockHash, nonce, currentBlockData);
-    while(hash.substring(0,4) != '0000'){
+    while (hash.substring(0, 4) != '0000') {
         nonce++;
         hash = this.calculateHash(previousBlockHash, nonce, currentBlockData);
     }
     return nonce;
 };
 
-Blockchain.prototype.chainIsValid = function(blockchain){
+Blockchain.prototype.chainIsValid = function (blockchain) {
     let validChain = true;
-    for(var i = 1; i < blockchain.length; i++){
+    for (var i = 1; i < blockchain.length; i++) {
         const currentBlock = blockchain[i];
-        const previousBlock = blockchain[i-1];
+        const previousBlock = blockchain[i - 1];
         //check if data of each block is valid
-        const blockHash = this.calculateHash(previousBlock.hash, currentBlock.nonce, {transactions: currentBlock.transactions, index: currentBlock.index});
-        if(blockHash.substring(0,4) !== '0000') validChain = false;
+        const blockHash = this.calculateHash(previousBlock.hash, currentBlock.nonce, { transactions: currentBlock.transactions, index: currentBlock.index });
+        if (blockHash.substring(0, 4) !== '0000') validChain = false;
         //compares hashes
-        if(currentBlock.previousBlockHash !== previousBlock.hash) validChain = false;
+        if (currentBlock.previousBlockHash !== previousBlock.hash) validChain = false;
     }
 
     //checking credibility of genesis block
@@ -84,26 +92,26 @@ Blockchain.prototype.chainIsValid = function(blockchain){
     const correctPrevHash = genesisBlock.previousBlockHash === null;
     const correctHash = genesisBlock.hash === this.calculateHash(null, 100, this.transactions);
     const correctData = genesisBlock.transactions.length === 0;
-    if(!correctNonce || !correctPrevHash || !correctHash || !correctData) validChain = false;
+    if (!correctNonce || !correctPrevHash || !correctHash || !correctData) validChain = false;
 
     return validChain;
 };
 
-Blockchain.prototype.getBlock = function(blockHash){
+Blockchain.prototype.getBlock = function (blockHash) {
     let correctBlock = null;
     this.chain.forEach(block => {
-        if(block.hash === blockHash) correctBlock = block;
+        if (block.hash === blockHash) correctBlock = block;
     });
     return correctBlock;
 };
 
-Blockchain.prototype.getTransaction = function(transactionId){
+Blockchain.prototype.getTransaction = function (transactionId) {
     let correctTransaction = null;
     let correctBlock = null;
 
     this.chain.forEach(block => {
         block.transactions.forEach(transaction => {
-            if(transaction.transactionId === transactionId){
+            if (transaction.transactionId === transactionId) {
                 correctTransaction = transaction;
                 correctBlock = block;
             }
@@ -115,19 +123,19 @@ Blockchain.prototype.getTransaction = function(transactionId){
     };
 };
 
-Blockchain.prototype.getAddressData = function(address){
+Blockchain.prototype.getAddressData = function (address) {
     const addressTnx = [];
     this.chain.forEach(block => {
         block.transactions.forEach(transaction => {
-            if(transaction.sender === address || transaction.recipient === address){
+            if (transaction.sender === address || transaction.recipient === address) {
                 addressTnx.push(transaction);
             }
         });
     });
     let balance = 0;
     addressTnx.forEach(transaction => {
-        if(transaction.recipient === address) balance += transaction.amount;
-        else if(transaction.sender === address) balance -= transaction.amount;
+        if (transaction.recipient === address) balance += transaction.amount;
+        else if (transaction.sender === address) balance -= transaction.amount;
     });
     return {
         addressTransaction: addressTnx,

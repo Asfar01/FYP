@@ -10,6 +10,11 @@ const User = mongoose.model(
       lastName: { type: String, required: true },
     },
 
+    userType: {
+      type: Number,
+      required: false
+    },
+
     email: {
       type: String,
       minlength: 7,
@@ -24,20 +29,13 @@ const User = mongoose.model(
       required: true,
     },
 
-    wallet: {
-      type: Number,
-      default: 100,
-    },
+    benchmark: [
+      {
+        type: {type: Number, required: true},
+        score: {type: Number, required: true}
+      }
+    ],
 
-    // benchmark: {
-    //   Mathematical: {type: String},
-    //   Image: {type: String},
-    //   Video: {type: String}
-    // },
-
-    benchmark: {
-      type: Number,
-    },
     flag: {
       type: Boolean,
       default: true,
@@ -51,6 +49,7 @@ function validateUser(user) {
     firstName: Joi.string().min(2).max(50).required(),
     lastName: Joi.string().min(2).max(50).required(),
     phone: Joi.string().min(11).max(11).required(),
+    userType: Joi.number().min(0).max(1).required(),
     email: Joi.string().regex(
       /^(([^<>()\[\]\\.,;:\s@“]+(\.[^<>()\[\]\\.,;:\s@“]+)*)|(“.+“))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     ),

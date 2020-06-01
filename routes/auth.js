@@ -28,7 +28,7 @@ router.post('/signup', async (req, res, next) => {
 	const { error } = validate(req.body);  
 	if (error) return res.status(403).send(error.details[0]);
 	try {
-		const { firstName, lastName, phone, email, username, password } = req.body;
+		const { firstName, lastName, phone, email, username, password, userType } = req.body;
 		let hashedPassword;
 
 		let userEmail = await User.findOne({ email });
@@ -45,7 +45,7 @@ router.post('/signup', async (req, res, next) => {
 
 		if (!hashedPassword) return res.status(400).send("Could not hash the password");
     
-		user = new User({ name: { firstName, lastName }, email, phone});
+		user = new User({ name: { firstName, lastName }, email, phone, userType});
 		await user.save();
 
 		auth = new Auth({ username, password: hashedPassword, user_id: user._id });
