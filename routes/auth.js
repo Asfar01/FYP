@@ -30,7 +30,7 @@ router.post('/signup', async (req, res, next) => {
 	try {
 		const { firstName, lastName, phone, email, username, password, userType } = req.body;
 		let hashedPassword;
-		console.log('firstname is : ', firstName)
+		console.log('firstname is : ', firstName);
 		let userEmail = await User.findOne({ email });
 		if (userEmail) return res.status(409).send("This email already exists");
 
@@ -45,7 +45,7 @@ router.post('/signup', async (req, res, next) => {
 
 		if (!hashedPassword) return res.status(400).send("Could not hash the password");
     
-		user = new User({ name: { firstName, lastName }, email, phone, userType});
+		user = new User({ name: { firstName, lastName }, email, phone});
 		await user.save();
 
 		auth = new Auth({ username, password: hashedPassword, user_id: user._id });

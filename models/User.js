@@ -10,10 +10,10 @@ const User = mongoose.model(
       lastName: { type: String, required: true },
     },
 
-    userType: {
-      type: Number,
-      required: false
-    },
+    // userType: {
+    //   type: Number,
+    //   required: false
+    // },
 
     email: {
       type: String,
