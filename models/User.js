@@ -10,10 +10,10 @@ const User = mongoose.model(
       lastName: { type: String, required: true },
     },
 
-    // userType: {
-    //   type: Number,
-    //   required: false
-    // },
+    userType: {
+      type: Number,
+      required: false
+    },
 
     email: {
       type: String,
@@ -49,7 +49,7 @@ function validateUser(user) {
     firstName: Joi.string().min(2).max(50).required(),
     lastName: Joi.string().min(2).max(50).required(),
     phone: Joi.string().min(11).max(11).required(),
-    userType: Joi.number().min(0).max(1).required(),
+    userType: Joi.number().min(0).max(1),
     email: Joi.string().regex(
       /^(([^<>()\[\]\\.,;:\s@“]+(\.[^<>()\[\]\\.,;:\s@“]+)*)|(“.+“))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     ),

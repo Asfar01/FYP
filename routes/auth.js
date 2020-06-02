@@ -28,7 +28,7 @@ router.post('/signup', async (req, res, next) => {
 	const { error } = validate(req.body);
 	if (error) return res.status(403).send(error.details[0]);
 	try {
-		const { firstName, lastName, phone, email, username, password, userType } = req.body;
+		const { firstName, lastName, phone, email, username, password } = req.body;
 		let hashedPassword;
 		console.log('firstname is : ', firstName);
 		let userEmail = await User.findOne({ email });
@@ -54,7 +54,7 @@ router.post('/signup', async (req, res, next) => {
 		let data = { user, username };
 
 		const token = jwt.sign({ data }, 'jwtPrivateKey');
-		res.status(200).header('x-auth-token', token).send(data);
+		res.status(201).header('x-auth-token', token).send(data);
 	} catch (e) {
 		return res.status(400).send(e);
 	}
