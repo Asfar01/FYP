@@ -5,11 +5,11 @@
   "scripts": {
     "start": "nodemon ./bin/www",
     "dev": "concurrently \"nodemon bin/www\" \"npm start --prefix client\"",
-    "node_1": "nodemon --watch routes -e js routes/networkNode.js 3001 http://localhost:3001",
-    "node_2": "nodemon --watch routes -e js routes/networkNode.js 3002 http://localhost:3002",
-    "node_3": "nodemon --watch routes -e js routes/networkNode.js 3003 http://localhost:3003",
-    "node_4": "nodemon --watch routes -e js routes/networkNode.js 3004 http://localhost:3004",
-    "node_5": "nodemon --watch routes -e js routes/networkNode.js 3005 http://localhost:3005"
+    "node_1": "nodemon ./bin/www 3001 http://localhost:3001",
+    "node_2": "nodemon ./bin/www 3002 http://localhost:3002",
+    "node_3": "nodemon ./bin/www 3003 http://localhost:3003",
+    "node_4": "nodemon ./bin/www 3004 http://localhost:3004",
+    "node_5": "nodemon ./bin/www 3005 http://localhost:3005"
   },
   "dependencies": {
     "@hapi/joi": "^15.0.3",
@@ -19,6 +19,7 @@
     "cors": "^2.8.5",
     "crypto-js": "^4.0.0",
     "debug": "~2.6.9",
+    "elliptic": "^6.5.2",
     "express": "~4.16.1",
     "http-errors": "^1.6.3",
     "jade": "~1.11.0",
@@ -26,6 +27,7 @@
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.9.10",
     "morgan": "~1.9.1",
+    "nodemailer": "^6.4.8",
     "request": "^2.88.2",
     "request-promise": "^4.2.5",
     "uuid": "^8.1.0"

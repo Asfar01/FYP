@@ -1,30 +1,26 @@
 const express = require('express');
-const bodyParser = require('body-parser');
+const router = express.Router();
 const BlockChain = require('../blockchain/blockchain');
 const { v1: uuidv1 } = require('uuid');
 const nodeAddress = uuidv1().split('-').join('');
-const app = express();
 const sikay = new BlockChain();
-const port = process.argv[2];
 const rp = require('request-promise');
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+const { Sikay } = require('../models/Sikay');
 
 //gets entire blockchain
-app.get('/blockchain', function (req, res) {
+router.get('/blockchain', function (req, res) {
     res.send(sikay);
 });
 
 //creates a new transaction
-app.post('/transaction', function (req, res) {
+router.post('/transaction', function (req, res) {
     const newTransaction = req.body;
     const blockIndex = sikay.addTransactionsToPendingTxs(newTransaction);
     res.json({ note: `The transaction will be added in block number ${blockIndex}.` });
 });
 
 //broadcasts the transaction to the whole network
-app.post('/transaction/broadcast', function (req, res) {
+router.post('/transaction/broadcast', function (req, res) {
     const newTransaction = sikay.createNewTransaction(req.body.amount, req.body.sender, req.body.recipient);
     sikay.addTransactionsToPendingTxs(newTransaction);
 
@@ -44,7 +40,7 @@ app.post('/transaction/broadcast', function (req, res) {
 });
 
 //Adds a new block to the blockchain
-app.get('/mine', function (req, res) {
+router.get('/mine', function (req, res) {
     const lastBlock = sikay.getLastBlock();
     const previousBlockHash = lastBlock.hash;
 
@@ -57,6 +53,10 @@ app.get('/mine', function (req, res) {
     const blockHash = sikay.calculateHash(previousBlockHash, nonce, currentBlockData);
 
     const newBlock = sikay.createNewBlock(nonce, previousBlockHash, blockHash);
+
+    block = new Sikay({index: newBlock.index, timestamp: newBlock.timestamp, transactions: newBlock.transactions, nonce: newBlock.nonce, hash: newBlock.hash, previousHash: newBlock.previousBlockHash});
+    block.save();
+    console.log("block added to the DB");
 
     const requestPromises = [];
     sikay.networkNodes.forEach(networkNodeUrl => {
@@ -88,20 +88,20 @@ app.get('/mine', function (req, res) {
     });
 });
 
-app.post('/receive-new-block', function(req, res) {
+router.post('/receive-new-block', function (req, res) {
     const newBlock = req.body.newBlock;
     const lastBlock = sikay.getLastBlock();
     const correctHash = lastBlock.hash === newBlock.previousBlockHash;
     const correctIndex = lastBlock.index + 1 === newBlock.index;
 
-    if(correctHash && correctIndex){
+    if (correctHash && correctIndex) {
         sikay.chain.push(newBlock);
         sikay.pendingTransactions = [];
         res.json({
             note: 'New block recieved and accepted successfully.',
             newBlock: newBlock
         });
-    } else{
+    } else {
         res.json({
             note: 'New block rejected.',
             newBlock: newBlock
@@ -110,7 +110,7 @@ app.post('/receive-new-block', function(req, res) {
 });
 
 //takes a url and sync the note with every registered node
-app.post('/register-and-broadcast-node', function (req, res) {
+router.post('/register-and-broadcast-node', function (req, res) {
     const newNodeUrl = req.body.newNodeUrl;
     if (sikay.networkNodes.indexOf(newNodeUrl) == -1) sikay.networkNodes.push(newNodeUrl);
 
@@ -138,14 +138,14 @@ app.post('/register-and-broadcast-node', function (req, res) {
     });
 });
 
-app.post('/register-node', function (req, res) {
+router.post('/register-node', function (req, res) {
     const newNodeUrl = req.body.newNodeUrl;
     const notCurrentNode = sikay.currentNodeUrl !== newNodeUrl;
     if (sikay.networkNodes.indexOf(newNodeUrl) == -1 && notCurrentNode) sikay.networkNodes.push(newNodeUrl);
     res.json({ note: 'New node registered successfully.' });
 });
 
-app.post('/register-node-bulk', function (req, res) {
+router.post('/register-node-bulk', function (req, res) {
     const allNetworkNodes = req.body.allNetworkNodes;
     allNetworkNodes.forEach(networkNodeUrl => {
         const nodeNotPresent = sikay.networkNodes.indexOf(networkNodeUrl) == -1;
@@ -156,7 +156,7 @@ app.post('/register-node-bulk', function (req, res) {
 });
 
 
-app.get('/consensus', function (req, res) {
+router.get('/consensus', function (req, res) {
     const requestPromises = [];
     sikay.networkNodes.forEach(networkNodeUrl => {
         const requestOptions = {
@@ -173,19 +173,19 @@ app.get('/consensus', function (req, res) {
         let newPendingTransactions = null;
 
         blockchains.forEach(blockchain => {
-            if(blockchain.chain.length > maxChainLength){
+            if (blockchain.chain.length > maxChainLength) {
                 maxChainLength = blockchain.chain.length;
                 newLongestChain = blockchain.chain;
                 newPendingTransactions = blockchain.pendingTransactions;
             }
         });
 
-        if(!newLongestChain || (newLongestChain && !sikay.chainIsValid(newLongestChain))){
+        if (!newLongestChain || (newLongestChain && !sikay.chainIsValid(newLongestChain))) {
             res.json({
                 note: 'The current chain has not been replaced.',
                 chain: sikay.chain
             });
-        }else{
+        } else {
             sikay.chain = newLongestChain;
             sikay.pendingTransactions = newPendingTransactions;
             res.json({
@@ -196,10 +196,10 @@ app.get('/consensus', function (req, res) {
     });
 });
 
-app.get('/block/:blockHash', function(req, res) {
+router.get('/block/:blockHash', function (req, res) {
     const blockHash = req.params.blockHash;
     const correctBlock = sikay.getBlock(blockHash);
-    if(correctBlock !== null) res.json({
+    if (correctBlock !== null) res.json({
         block: correctBlock
     });
     else res.json({
@@ -207,10 +207,10 @@ app.get('/block/:blockHash', function(req, res) {
     });
 });
 
-app.get('/transaction/:transactionId', function(req, res) {
+router.get('/transaction/:transactionId', function (req, res) {
     const transactionId = req.params.transactionId;
     const transactionData = sikay.getTransaction(transactionId);
-    if(transactionData.transaction !== null) res.json({
+    if (transactionData.transaction !== null) res.json({
         transaction: transactionData.transaction,
         block: transactionData.block
     });
@@ -219,7 +219,7 @@ app.get('/transaction/:transactionId', function(req, res) {
     });
 });
 
-app.get('/address/:address', function(req, res) {
+router.get('/address/:address', function (req, res) {
     const address = req.params.address;
     const addressData = sikay.getAddressData(address);
     res.json({
@@ -227,7 +227,4 @@ app.get('/address/:address', function(req, res) {
     });
 });
 
-
-app.listen(port, function () {
-    console.log(`Listening on port ${port}....`);
-});
+module.exports = router;
