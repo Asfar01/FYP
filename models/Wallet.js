@@ -23,7 +23,7 @@ const Wallet = mongoose.model(
     balance : {
         type: Number,
         required: true,
-        default: 100
+        default: 0
     },
 
     flag: {
