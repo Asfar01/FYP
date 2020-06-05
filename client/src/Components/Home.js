@@ -4,7 +4,7 @@ import Button from "@material-ui/core/Button";
 class Home extends Component {
   constructor() {
     super();
-    this.state = { benchmark: "", gpn: 0 };
+    this.state = { benchmark: "", time: null };
     // this.handleInputChange =this.handleInputChange.bind(this);
     // this.submitbenchmark =this.submitbenchmark.bind(this);
   }
@@ -14,23 +14,28 @@ class Home extends Component {
     for (m; m > 0; m--) {
       len = len.concat("9");
     }
+
     var n = parseInt(len);
     let strt = performance.now();
     this.find_grt_pn(n);
     let endt = performance.now();
-    //time taken to execute
-    document.querySelector("#exect").innerHTML = endt - strt;
+    this.setState({
+      time: endt - strt,
+    });
 
     //console.log(exect);
   }
 
   find_grt_pn(d) {
+    let gpn = 0;
     for (let i = d; i >= 0; i--) {
-      if (this.test_prime(i)) {
-        if (i > this.state.gpn) {
-          this.setState({ gpn: i });
+      setTimeout(() => {
+        if (this.test_prime(i)) {
+          if (i > gpn) {
+            gpn = i;
+          }
         }
-      }
+      }, 200);
     }
   }
 
@@ -60,11 +65,11 @@ class Home extends Component {
           fullWidth
           variant="contained"
           color="primary"
-          onClick={() => this.string_len(5)}
+          onClick={() => this.string_len(6)}
         >
           Benchmark
         </Button>
-        <div id="exect"></div>
+        {this.state.time && <div> {(this.state.time / 1000).toFixed(3)} </div>}
 
         <hr />
       </div>
