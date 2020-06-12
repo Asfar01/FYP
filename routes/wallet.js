@@ -14,12 +14,12 @@ router.get('/user/:id', async (req, res) => {
 	try {
 		const { id } = req.params;
 		const walletList = await Wallet.find({ user_id: id, flag: true });
-		let _walletList = []
+		let _walletList = [];
 
 		for(let i = 0; i < walletList.length; i++){
-			let wallet = walletList[i]
-			wallet._doc = _.omit(wallet._doc, 'privateKey') 
-			_walletList.push(wallet)
+			let wallet = walletList[i];
+			wallet._doc = _.omit(wallet._doc, 'privateKey');
+			_walletList.push(wallet);
 		}
 
 		return res.status(200).send(_walletList);
@@ -76,7 +76,7 @@ router.post('/createNewWallet', [checkBenchmark, checkWalletLimit, async (req, r
 				console.log('Email sent: ' + info.response);
 			}
 		});
-		res.locals.createdWallet = wallet
+		res.locals.createdWallet = wallet;
 		next();
 		// return res.status(201).send(wallet);
 
@@ -101,17 +101,17 @@ router.post('/authenticateWallet', async (req, res) => {
 router.delete('/deleteWallet', async (req, res) => {
 	try {
 		const { privateKey, _id } = req.body;
-		let wallet = await Wallet.findOne({_id})
+		let wallet = await Wallet.findOne({_id});
 		if(!wallet) return res.status(404).send({ err: { message: "Wallet not Found", code: "ERR_WNF" } });
 
 		const validKey = await bcrypt.compare(privateKey, wallet.privateKey);
 		if (!validKey) return res.status(400).send({ err: { message: "Invalid Wallet Key", code: "ERR_IWK" } });
 
-		wallet = await Wallet.findOneAndUpdate({_id, flag: true}, { flag: false }, {new: true})
-		return res.status(202).send("Wallet Deleted")
+		wallet = await Wallet.findOneAndUpdate({_id, flag: true}, { flag: false }, {new: true});
+		return res.status(202).send("Wallet Deleted");
 	} catch (e) {
-		return res.status(500).send({ err: { message: e.message, code: "ERR_SR" } })
+		return res.status(500).send({ err: { message: e.message, code: "ERR_SR" } });
 	}
-})
+});
 
 module.exports = router;

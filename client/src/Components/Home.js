@@ -65,7 +65,7 @@ class Home extends Component {
           fullWidth
           variant="contained"
           color="primary"
-          onClick={() => this.string_len(6)}
+          onClick={() => this.string_len(5)}
         >
           Benchmark
         </Button>

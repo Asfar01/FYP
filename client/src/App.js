@@ -1,11 +1,15 @@
 import React, { Component } from 'react';
 import Login from './Components/Login';
 import Signup from './Components/Signup';
+import task from './Components/task';
+
 // import Regular from './components/regular';
 // import Special from './components/special';
 import Home from './Components/Home';
 import { BrowserRouter as Router, Link, Route } from 'react-router-dom';
 import { isAuthenticated } from './repository';
+
+
 
 
 
@@ -34,7 +38,7 @@ const styles = {
   title: {
     flexGrow: 1,
   },
-}
+};
 
 
 class App extends Component {
