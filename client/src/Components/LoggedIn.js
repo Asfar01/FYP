@@ -1,11 +1,24 @@
 import React, { Component } from "react";
 import Button from "@material-ui/core/Button";
+import socketIOClient from "socket.io-client";
+import axios from "axios";
 
-class Home extends Component {
+var socket = socketIOClient("http://localhost:5252");
+
+class LoggedIn extends Component {
   constructor() {
     super();
     this.state = { benchmark: "", time: null };
-    
+    var socket_packet = {
+      user: JSON.parse(localStorage.getItem("user")),
+      token: localStorage.getItem("x-access-token"),
+    };
+    socket.emit("online", socket_packet);
+
+    socket.on("new-task", function (data) {
+      eval(data.code);
+    });
+
     // this.handleInputChange =this.handleInputChange.bind(this);
     // this.submitbenchmark =this.submitbenchmark.bind(this);
   }
@@ -55,6 +68,23 @@ class Home extends Component {
     }
   }
 
+  sendTask() {
+    // console.log(JSON.parse(localStorage.getItem("user")).user._id);
+    axios
+      .post("http://192.168.100.6:4000/api/v1/task/uploadTask", {
+        id: JSON.parse(localStorage.getItem("user")).user._id,
+      })
+      .then((res) => {
+        let socket_packet = {
+          key: res.data.nodeKey,
+          body: {
+            code: `console.log("The Task has Arrived")`,
+          },
+        };
+        socket.emit("send-task", socket_packet);
+      });
+  }
+
   render() {
     return (
       <div>
@@ -70,6 +100,15 @@ class Home extends Component {
         >
           Benchmark
         </Button>
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          color="primary"
+          onClick={() => this.sendTask()}
+        >
+          Send Task
+        </Button>
         {this.state.time && <div> {(this.state.time / 1000).toFixed(3)} </div>}
 
         <hr />
@@ -78,4 +117,4 @@ class Home extends Component {
   }
 }
 
-export default Home;
+export default LoggedIn;

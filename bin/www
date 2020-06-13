@@ -4,7 +4,7 @@
  * Module dependencies.
  */
 
-var app = require("../app");
+var { app } = require("../app");
 var debug = require("debug")("khunshan-fyp:server");
 var http = require("http");
 
@@ -25,7 +25,7 @@ var server = http.createServer(app);
  * Listen on provided port, on all network interfaces.
  */
 
-module.exports = server.listen(port, () => {
+server.listen(port, () => {
   console.log(`Express Server is running on port:${port}`);
 });
 server.on("error", onError);

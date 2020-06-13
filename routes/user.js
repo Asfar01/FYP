@@ -5,9 +5,11 @@ const { User } = require("../models/User");
 //Update Benchmark
 router.post("/:id/upBench", async (req, res) => {
   const { id } = req.params;
-  const { type, score } = req.body;
+  const { score } = req.body;
   try {
-    let user = await User.findByIdAndUpdate(id, { $push: { benchmark: { type, score } } });
+    let user = await User.findByIdAndUpdate(id, {
+      $push: { benchmark: score },
+    });
     user = await User.findById(id);
     res.status(201).send(user);
   } catch (err) {

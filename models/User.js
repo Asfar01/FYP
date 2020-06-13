@@ -12,7 +12,7 @@ const User = mongoose.model(
 
     userType: {
       type: Number,
-      required: false
+      required: false,
     },
 
     email: {
@@ -31,9 +31,9 @@ const User = mongoose.model(
 
     benchmark: [
       {
-        type: {type: Number, required: true},
-        score: {type: Number, required: true}
-      }
+        type: Number,
+        required: true,
+      },
     ],
 
     flag: {

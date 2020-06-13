@@ -65,7 +65,9 @@ class Login extends Component {
     event.preventDefault();
     console.log(this.state);
     login(this.state)
-      .then((token) => (window.location = "/"))
+      .then((token) => {
+        window.location = "/logged";
+      })
       .catch((err) => alert(err));
   }
 
