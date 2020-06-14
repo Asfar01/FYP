@@ -3,6 +3,7 @@ const router = express.Router();
 const _ = require("lodash");
 const { Wallet } = require("../models/Wallet");
 const OnlineUsers = require("../onlineUser");
+const BusyUsers = require("../busyUsers");
 const { User } = require("../models/User");
 const { io } = require("../app");
 
@@ -23,8 +24,17 @@ router.post("/uploadTask", async (req, res) => {
 
     // Online users
     var onlineUsers = new OnlineUsers();
+    var busyUsers = new BusyUsers();
+
     console.log("online_", onlineUsers.get());
     let users = _.values(onlineUsers.get());
+    let busy_ = _.values(busyUsers.get());
+
+    // filtering the busy users
+    users = _.filter(users, function(user) {
+      return !(user in busy_)
+    })
+
 
     let userBenchmarkList = [];
 
@@ -40,9 +50,7 @@ router.post("/uploadTask", async (req, res) => {
     }
 
     if (!userBenchmarkList.length) {
-      return res
-        .status(400)
-        .send({ err: "No users online to serve your task, sad :(" });
+      return res.status(400).send({ err: "No users online to serve your task, sad :(" });
     }
     bestBenchmark = min(userBenchmarkList);
 

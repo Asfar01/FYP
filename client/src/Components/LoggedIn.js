@@ -6,6 +6,11 @@ import axios from "axios";
 var socket = socketIOClient("http://localhost:5252");
 
 class LoggedIn extends Component {
+  state = {
+    task: null,
+    sendTask: null, 
+  }
+
   constructor() {
     super();
     this.state = { benchmark: "", time: null };
@@ -15,15 +20,24 @@ class LoggedIn extends Component {
     };
     socket.emit("online", socket_packet);
 
-    socket.on("new-task", function (data) {
-      eval(data.code);
+    socket.on("new-task", (data) => {
+      this.setState({
+        task: data
+      })
     });
+
+    socket.on("complete-task-notification", (data) => {
+
+      this.setState({
+        sendTask: { ...this.state.sendTask , status: "comppleted", result: data.result}
+      })
+    })
 
     // this.handleInputChange =this.handleInputChange.bind(this);
     // this.submitbenchmark =this.submitbenchmark.bind(this);
   }
 
-  string_len(m) {
+  string_len =  async (m) => {
     let len = "";
     for (m; m > 0; m--) {
       len = len.concat("9");
@@ -40,7 +54,7 @@ class LoggedIn extends Component {
     //console.log(exect);
   }
 
-  find_grt_pn(d) {
+  find_grt_pn = (d) => {
     let gpn = 0;
     for (let i = d; i >= 0; i--) {
       setTimeout(() => {
@@ -53,7 +67,7 @@ class LoggedIn extends Component {
     }
   }
 
-  test_prime(n) {
+  test_prime = (n) => {
     if (n === 1) {
       return false;
     } else if (n === 2) {
@@ -68,10 +82,10 @@ class LoggedIn extends Component {
     }
   }
 
-  sendTask() {
+  sendTask = () => {
     // console.log(JSON.parse(localStorage.getItem("user")).user._id);
     axios
-      .post("http://192.168.100.6:4000/api/v1/task/uploadTask", {
+      .post("http://localhost:4000/api/v1/task/uploadTask", {
         id: JSON.parse(localStorage.getItem("user")).user._id,
       })
       .then((res) => {
@@ -81,8 +95,22 @@ class LoggedIn extends Component {
             code: `console.log("The Task has Arrived")`,
           },
         };
+        this.setState({
+          sendTask: {...socket_packet, status: "Running" }
+        })
         socket.emit("send-task", socket_packet);
       });
+  }
+
+  startTask = async (val) => {
+    var socket_packet = {
+      user: JSON.parse(localStorage.getItem("user")),
+      token: localStorage.getItem("x-access-token"),
+    };
+    socket.emit("busy", socket_packet);
+    this.string_len(val).then(() => {
+      socket.emit("complete", { key: this.state.task.senderKey ,result: this.state.time });
+    })
   }
 
   render() {
@@ -109,6 +137,28 @@ class LoggedIn extends Component {
         >
           Send Task
         </Button>
+        {(this.state.sendTask) ?
+          <div>
+            <p><b>{this.state.sendTask.key}</b>:  {this.state.sendTask.status}</p>
+            {(this.state.sendTask.result) ? 
+              <p><b>Result:</b> {(this.state.sendTask.result/1000).toFixed(3)}</p>: <React.Fragment/>
+            }
+          </div>: <React.Fragment/> 
+        }
+        {(this.state.task) ? 
+          <div>
+            <p>{this.state.task.code}</p>
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              color="primary"
+              onClick={() => this.startTask(5)}
+            >
+              Start Task
+            </Button>
+          </div>: <React.Fragment/>
+        }
         {this.state.time && <div> {(this.state.time / 1000).toFixed(3)} </div>}
 
         <hr />

@@ -6,6 +6,8 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 var _ = require("lodash");
 var OnlineUsers = require("./onlineUser");
+var BusyUsers = require("./busyUsers");
+const { func } = require("@hapi/joi");
 const app = express();
 
 app.use(bodyParser.json());
@@ -39,6 +41,7 @@ app.use(function (err, req, res, next) {
 
 // Socket .io
 let onlineUsers = new OnlineUsers();
+let busyUsers = new BusyUsers();
 const http = require("http").Server(app);
 const io = require("socket.io")(http);
 const SOCKET_PORT = 5252;
@@ -53,17 +56,46 @@ io.sockets.on("connection", function (client) {
     }
   });
 
+  client.on("busy", function (data) {
+    if (!!data.user) {
+      busyUsers.push(client.id, {
+        ...data.user,
+        clientId: client.id,
+      });
+      console.log("Busy users", busyUsers.get());
+    }
+  })
+
+
+  client.on("complete", function (data) {
+    busyUsers.pop(client.id);
+    try{
+      io.sockets.connected[data.key].emit("complete-task-notification", {result: data.result, messgae: "Task completed", id: client.id});
+    }catch(e){  
+      console.log(e.message)
+    }
+
+    console.log("Online Users", onlineUsers.get())
+    console.log("Busy Users", busyUsers.get())
+  })
+
+  client.on("kill-task", function() {
+    busyUsers.pop(client.id);
+  })
+
   client.on("send-task", function (data) {
     console.log(data);
     try {
-      io.sockets.connected[data.key].emit("new-task", data.body);
+      io.sockets.connected[data.key].emit("new-task", {...data.body, senderKey: client.id});
     } catch (e) {
       console.log(e.message);
     }
   });
 
+
   client.on("disconnect", function () {
     onlineUsers.pop(client.id);
+    busyUsers.pop(client.id);
     console.log("disconnected");
   });
 });
