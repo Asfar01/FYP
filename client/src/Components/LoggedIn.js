@@ -23,15 +23,15 @@ class LoggedIn extends Component {
     socket.on("new-task", (data) => {
       this.setState({
         task: data
-      })
+      });
     });
 
     socket.on("complete-task-notification", (data) => {
 
       this.setState({
-        sendTask: { ...this.state.sendTask , status: "comppleted", result: data.result}
-      })
-    })
+        sendTask: { ...this.state.sendTask , status: "completed", result: data.result}
+      });
+    });
 
     // this.handleInputChange =this.handleInputChange.bind(this);
     // this.submitbenchmark =this.submitbenchmark.bind(this);
@@ -65,7 +65,7 @@ class LoggedIn extends Component {
         }
       }, 200);
     }
-  }
+  };
 
   test_prime = (n) => {
     if (n === 1) {
@@ -80,7 +80,7 @@ class LoggedIn extends Component {
       }
       return true;
     }
-  }
+  };
 
   sendTask = () => {
     // console.log(JSON.parse(localStorage.getItem("user")).user._id);
@@ -92,15 +92,15 @@ class LoggedIn extends Component {
         let socket_packet = {
           key: res.data.nodeKey,
           body: {
-            code: `console.log("The Task has Arrived")`,
+            code: `The Task has Arrived`,
           },
         };
         this.setState({
           sendTask: {...socket_packet, status: "Running" }
-        })
+        });
         socket.emit("send-task", socket_packet);
       });
-  }
+  };
 
   startTask = async (val) => {
     var socket_packet = {
@@ -110,8 +110,8 @@ class LoggedIn extends Component {
     socket.emit("busy", socket_packet);
     this.string_len(val).then(() => {
       socket.emit("complete", { key: this.state.task.senderKey ,result: this.state.time });
-    })
-  }
+    });
+  };
 
   render() {
     return (

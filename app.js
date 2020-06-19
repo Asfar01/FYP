@@ -64,7 +64,7 @@ io.sockets.on("connection", function (client) {
       });
       console.log("Busy users", busyUsers.get());
     }
-  })
+  });
 
 
   client.on("complete", function (data) {
@@ -72,16 +72,16 @@ io.sockets.on("connection", function (client) {
     try{
       io.sockets.connected[data.key].emit("complete-task-notification", {result: data.result, messgae: "Task completed", id: client.id});
     }catch(e){  
-      console.log(e.message)
+      console.log(e.message);
     }
 
-    console.log("Online Users", onlineUsers.get())
-    console.log("Busy Users", busyUsers.get())
-  })
+    console.log("Online Users", onlineUsers.get());
+    console.log("Busy Users", busyUsers.get());
+  });
 
   client.on("kill-task", function() {
     busyUsers.pop(client.id);
-  })
+  });
 
   client.on("send-task", function (data) {
     console.log(data);

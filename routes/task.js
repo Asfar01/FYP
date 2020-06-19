@@ -18,7 +18,7 @@ router.post("/uploadTask", async (req, res) => {
         break;
       }
       if (i == wallets.length - 1) {
-        return res.status(400).send("You don't have enough sikay");
+        return res.status(202).send("You don't have enough sikay");
       }
     }
 
@@ -32,8 +32,8 @@ router.post("/uploadTask", async (req, res) => {
 
     // filtering the busy users
     users = _.filter(users, function(user) {
-      return !(user in busy_)
-    })
+      return !(user in busy_);
+    });
 
 
     let userBenchmarkList = [];
@@ -50,7 +50,7 @@ router.post("/uploadTask", async (req, res) => {
     }
 
     if (!userBenchmarkList.length) {
-      return res.status(400).send({ err: "No users online to serve your task, sad :(" });
+      return res.status(200).send({ err: "No users online to serve your task, sad :(" });
     }
     bestBenchmark = min(userBenchmarkList);
 
