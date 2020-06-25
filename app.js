@@ -70,7 +70,7 @@ io.sockets.on("connection", function (client) {
   client.on("complete", function (data) {
     busyUsers.pop(client.id);
     try{
-      io.sockets.connected[data.key].emit("complete-task-notification", {result: data.result, messgae: "Task completed", id: client.id});
+      io.sockets.connected[data.key].emit("complete-task-notification", {result: data.result, message: "Task completed", id: client.id});
     }catch(e){  
       console.log(e.message);
     }
@@ -92,6 +92,15 @@ io.sockets.on("connection", function (client) {
     }
   });
 
+  client.on("running", function (data) {
+    try{
+      console.log("running:", data);
+      io.sockets.connected[data.key].emit("running-task-notification", { message: "Task Running", id: client.id});
+    }catch(e){  
+      console.log(e.message);
+    }
+
+  });
 
   client.on("disconnect", function () {
     onlineUsers.pop(client.id);

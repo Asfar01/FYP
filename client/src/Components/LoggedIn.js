@@ -27,9 +27,16 @@ class LoggedIn extends Component {
     });
 
     socket.on("complete-task-notification", (data) => {
-
+  
       this.setState({
-        sendTask: { ...this.state.sendTask , status: "completed", result: data.result}
+        sendTask: { ...this.state.sendTask , status: data.message, result: data.result}
+      });
+    });
+
+    socket.on("running-task-notification", (data) => {
+      console.log("running notification", data);
+      this.setState({
+        sendTask: { ...this.state.sendTask , status: data.message}
       });
     });
 
@@ -96,7 +103,7 @@ class LoggedIn extends Component {
           },
         };
         this.setState({
-          sendTask: {...socket_packet, status: "Running" }
+          sendTask: {...socket_packet, status: "Uploaded" }
         });
         socket.emit("send-task", socket_packet);
       });
@@ -107,6 +114,7 @@ class LoggedIn extends Component {
       user: JSON.parse(localStorage.getItem("user")),
       token: localStorage.getItem("x-access-token"),
     };
+    socket.emit("running", { key: this.state.task.senderKey });
     socket.emit("busy", socket_packet);
     this.string_len(val).then(() => {
       socket.emit("complete", { key: this.state.task.senderKey ,result: this.state.time });
@@ -153,7 +161,7 @@ class LoggedIn extends Component {
               fullWidth
               variant="contained"
               color="primary"
-              onClick={() => this.startTask(5)}
+              onClick={() => {this.startTask(6)}}
             >
               Start Task
             </Button>
