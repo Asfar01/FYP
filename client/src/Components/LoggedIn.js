@@ -8,7 +8,8 @@ var socket = socketIOClient("http://localhost:5252");
 class LoggedIn extends Component {
   state = {
     task: null,
-    sendTask: null, 
+    sendTask: null,
+    apiHit: null
   }
 
   constructor() {
@@ -26,11 +27,25 @@ class LoggedIn extends Component {
       });
     });
 
-    socket.on("complete-task-notification", (data) => {
-  
+    socket.on("complete-task-notification", async (data) => {
       this.setState({
         sendTask: { ...this.state.sendTask , status: data.message, result: data.result}
       });
+      console.log("api hit hony sy pehly", this.state.apiHit)
+      if(!this.state.apiHit){
+      await axios
+      .post("http://localhost:3001/transaction/broadcast", {
+        amount: 25,
+        sender: JSON.parse(localStorage.getItem("user")).user._id,
+        recipient:'275278785dryetrh'
+        
+      }).then((response) => {
+        console.log(response);
+        this.setState({apiHit:true}, () => {
+          console.log(this.state.apiHit)
+        })
+
+      })};
     });
 
     socket.on("running-task-notification", (data) => {
