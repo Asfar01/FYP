@@ -20,6 +20,11 @@ const Task = mongoose.model(
       enum: ["Pending", "Rejected", "Completed"],
       default: "Pending",
     },
+    type: {
+      type: String,
+      enum: ["PrimeNumber", "Linear Regression", "Image"],
+      default: "PrimeNumber",
+    }
   })
 );
 

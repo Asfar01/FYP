@@ -63,6 +63,7 @@ router.post("/uploadTask", async (req, res) => {
         sender_id: id,
         recipient_id: bestBenchmark.userId,
         status: "Pending",
+        type:'PrimeNumber'
       });
       await task.save();
       console.log(task);
@@ -90,7 +91,6 @@ const min = (items) => {
 router.put("/taskUpdate", async (req, res) => {
   try {
     const task_id = req.body;
-    console.log(task_id);
     let task = await Task.findOneAndUpdate(
       task_id,
       {
@@ -98,10 +98,27 @@ router.put("/taskUpdate", async (req, res) => {
       },
       { new: true, omitUndefined: true }
     );
-    console.log(task);
     res.status(200).send(task);
   } catch (e) {
     res.status(400).send(e.message);
+  }
+});
+
+/* GET User Tasks. */
+router.get("/userTasks", async (req, res) => {
+  try {
+    const { user_id } = req.body;
+    let Tasks=[];
+    Tasks[0] = await Task.find({ sender_id: user_id });
+    console.log("Sender task is ", Tasks);
+   
+      Tasks[1] = await Task.find({ recipient_id: user_id });
+      console.log("Receiver task is ", Tasks);
+    
+    res.status(200).send(Tasks);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send(err.message);
   }
 });
 
