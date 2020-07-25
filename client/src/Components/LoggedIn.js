@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import Button from "@material-ui/core/Button";
 import socketIOClient from "socket.io-client";
 import axios from "axios";
+import { useAsync } from "react-async";
 
 var socket = socketIOClient("http://localhost:5252");
 
