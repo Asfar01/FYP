@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node index.js",
+    "start": "node ./bin/www",
     "dev": "concurrently \"nodemon bin/www\" \"npm start --prefix client\"",
     "node_1": "nodemon ./bin/www 3001 http://localhost:3001",
     "node_2": "nodemon ./bin/www 3002 http://localhost:3002",
@@ -20,7 +20,6 @@
     "crypto-js": "^4.0.0",
     "debug": "~2.6.9",
     "elliptic": "^6.5.2",
-    "esm": "^3.2.25",
     "express": "~4.16.1",
     "http-errors": "^1.6.3",
     "jade": "~1.11.0",
