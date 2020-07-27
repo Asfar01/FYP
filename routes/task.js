@@ -63,7 +63,7 @@ router.post("/uploadTask", async (req, res) => {
         sender_id: id,
         recipient_id: bestBenchmark.userId,
         status: "Pending",
-        type:'PrimeNumber'
+        type: "PrimeNumber",
       });
       await task.save();
       console.log(task);
@@ -71,7 +71,9 @@ router.post("/uploadTask", async (req, res) => {
       console.log(e.message);
       return res.status(400).send(e.message);
     }
-    return await res.status(200).send({ nodeKey: bestBenchmark.clientId });
+    return await res
+      .status(200)
+      .send({ nodeKey: bestBenchmark.clientId, task_id: task_id });
   } catch (e) {
     return res.status(500).send(e.message);
   }
@@ -105,16 +107,17 @@ router.put("/taskUpdate", async (req, res) => {
 });
 
 /* GET User Tasks. */
-router.get("/userTasks", async (req, res) => {
+router.get("/userTasks/:user_id", async (req, res) => {
   try {
-    const { user_id } = req.body;
-    let Tasks=[];
+    console.log("user Id: ", req.params);
+    const { user_id } = req.params;
+    let Tasks = [];
     Tasks[0] = await Task.find({ sender_id: user_id });
-    console.log("Sender task is ", Tasks);
-   
-      Tasks[1] = await Task.find({ recipient_id: user_id });
-      console.log("Receiver task is ", Tasks);
-    
+    // console.log("Sender task is ", Tasks);
+
+    Tasks[1] = await Task.find({ recipient_id: user_id });
+    // console.log("Receiver task is ", Tasks);
+
     res.status(200).send(Tasks);
   } catch (err) {
     console.error(err.message);

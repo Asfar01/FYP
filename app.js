@@ -66,12 +66,17 @@ io.sockets.on("connection", function (client) {
     }
   });
 
-
   client.on("complete", function (data) {
     busyUsers.pop(client.id);
-    try{
-      io.sockets.connected[data.key].emit("complete-task-notification", {result: data.result, task_id: data.task_id, message: "Task completed", id: client.id});
-    }catch(e){  
+    try {
+      io.sockets.connected[data.key].emit("complete-task-notification", {
+        result: data.result,
+        task_id: data.task_id,
+        message: "Task completed",
+        id: client.id,
+        performedBy: data.performer,
+      });
+    } catch (e) {
       console.log(e.message);
     }
 
@@ -79,7 +84,7 @@ io.sockets.on("connection", function (client) {
     console.log("Busy Users", busyUsers.get());
   });
 
-  client.on("kill-task", function() {
+  client.on("kill-task", function () {
     busyUsers.pop(client.id);
   });
 
@@ -89,6 +94,7 @@ io.sockets.on("connection", function (client) {
         ...data.body,
         task_id: data.task_id,
         number: data.primeNumber,
+        senderName: data.clientName,
         message: "New Task Arrived",
         senderKey: client.id,
         action: data.action,
@@ -99,13 +105,15 @@ io.sockets.on("connection", function (client) {
   });
 
   client.on("running", function (data) {
-    try{
+    try {
       console.log("running:", data);
-      io.sockets.connected[data.key].emit("running-task-notification", { message: "Task Running", id: client.id});
-    }catch(e){  
+      io.sockets.connected[data.key].emit("running-task-notification", {
+        message: "Task Running",
+        id: client.id,
+      });
+    } catch (e) {
       console.log(e.message);
     }
-
   });
 
   client.on("disconnect", function () {
