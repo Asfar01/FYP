@@ -46,6 +46,7 @@ router.post("/uploadTask", async (req, res) => {
         userBenchmarkList.push({
           clientId: users[i].clientId,
           userId: user._id,
+          firstName: user.name.firstName,
           benchmark: user.benchmark[user.benchmark.length - 1],
         });
       }
@@ -53,15 +54,18 @@ router.post("/uploadTask", async (req, res) => {
 
     if (!userBenchmarkList.length) {
       return res
-        .status(200)
+        .status(299)
         .send({ err: "No users online to serve your task, sad :(" });
     }
+    const thisUser = await User.findById(id);
     bestBenchmark = min(userBenchmarkList);
     try {
       task = new Task({
         task_id: task_id,
         sender_id: id,
+        senderName: thisUser.name.firstName,
         recipient_id: bestBenchmark.userId,
+        recipientName: bestBenchmark.firstName,
         status: "Pending",
         type: "PrimeNumber",
       });
@@ -92,15 +96,28 @@ const min = (items) => {
 
 router.put("/taskUpdate", async (req, res) => {
   try {
-    const task_id = req.body;
-    let task = await Task.findOneAndUpdate(
-      task_id,
-      {
-        status: "Completed",
-      },
-      { new: true, omitUndefined: true }
-    );
-    res.status(200).send(task);
+    const { task_id, status } = req.body;
+    console.log(task_id, status);
+    if (status == "Completed") {
+      let task = await Task.findOneAndUpdate(
+        { task_id },
+        {
+          status: status,
+          cost: 20,
+        },
+        { new: true, omitUndefined: true }
+      );
+      res.status(200).send(task);
+    } else {
+      let task = await Task.findOneAndUpdate(
+        { task_id },
+        {
+          status: status,
+        },
+        { new: true, omitUndefined: true }
+      );
+      res.status(200).send(task);
+    }
   } catch (e) {
     res.status(400).send(e.message);
   }

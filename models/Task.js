@@ -11,9 +11,17 @@ const Task = mongoose.model(
       type: mongoose.Schema.Types.ObjectId,
       required: true,
     },
+    senderName:{
+      type: String,
+      required: true
+    },
     recipient_id: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
+    },
+    recipientName:{
+      type: String,
+      required: true
     },
     status: {
       type: String,
@@ -24,6 +32,11 @@ const Task = mongoose.model(
       type: String,
       enum: ["PrimeNumber", "Linear Regression", "Image"],
       default: "PrimeNumber",
+    },
+    cost: {
+      type: Number,
+      required: true,
+      default: 0
     }
   })
 );

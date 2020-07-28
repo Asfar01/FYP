@@ -84,8 +84,18 @@ io.sockets.on("connection", function (client) {
     console.log("Busy Users", busyUsers.get());
   });
 
-  client.on("kill-task", function () {
+  client.on("kill-task", function (data) {
     busyUsers.pop(client.id);
+    try {
+      io.sockets.connected[data.key].emit("reject-task-notification", {
+        task_id: data.task_id,
+        message: "Task Rejected",
+        id: client.id,
+        performedBy: data.performer,
+      });
+    } catch (e) {
+      console.log(e.message);
+    }
   });
 
   client.on("send-task", function (data) {
