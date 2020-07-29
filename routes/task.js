@@ -33,9 +33,7 @@ router.post("/uploadTask", async (req, res) => {
     let busy_ = _.values(busyUsers.get());
 
     // filtering the busy users
-    users = _.filter(users, function (user) {
-      return !(user in busy_);
-    });
+    users = _.differenceWith(users, busy_, _.isEqual)
 
     let userBenchmarkList = [];
 
