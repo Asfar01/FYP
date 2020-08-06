@@ -19,7 +19,7 @@
     "cors": "^2.8.5",
     "crypto-js": "^4.0.0",
     "debug": "~2.6.9",
-    "elliptic": "^6.5.2",
+    "elliptic": "^6.5.3",
     "express": "~4.16.1",
     "extrapolate": "^1.0.2",
     "http-errors": "^1.6.3",
