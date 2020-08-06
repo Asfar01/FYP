@@ -91,8 +91,9 @@ router.post('/authenticateWallet', async (req, res) => {
 	const wallet = await Wallet.findOne({ publicKey });
 	if (!wallet) return res.status(404).send("Invalid public key.");
 
+	if(privateKey){
 	const validKey = await bcrypt.compare(privateKey, wallet.privateKey);
-	if (!validKey) return res.status(400).send('Invalid Private key.');
+	if (!validKey) return res.status(400).send('Invalid Private key.');}
 	console.log(wallet.balance);
 	return res.status(200).send((wallet.balance).toString());
 

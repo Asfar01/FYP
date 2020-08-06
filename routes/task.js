@@ -14,7 +14,6 @@ const { identity } = require("lodash");
 router.post("/uploadTask", async (req, res) => {
   try {
     const { id, task_id, data } = req.body;
-    module.exports.data
     // If the user has enough sikay
     let wallets = await Wallet.find({ user_id: id, flag: true });
     if (!wallets.length) return res.status(404).send("You have no wallet");
@@ -43,6 +42,7 @@ router.post("/uploadTask", async (req, res) => {
     for (let i = 0; i < users.length; i++) {
       const thisUser = await User.findById(id);
       const user = await User.findOne({ _id: users[i]._id });
+      console.log("extrapolated values:", user[i].extrapolater)
       if (user && thisUser.email !== user.email) {
         userBenchmarkList.push({
           clientId: users[i].clientId,
