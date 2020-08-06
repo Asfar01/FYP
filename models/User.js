@@ -41,6 +41,11 @@ const User = mongoose.model(
       default: true,
       required: true,
     },
+
+    extrapolater:
+    {
+      type: Object
+    }
   })
 );
 

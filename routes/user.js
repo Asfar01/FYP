@@ -1,14 +1,24 @@
 var express = require("express");
 var router = express.Router();
+const extrap = require("extrapolate");
 const { User } = require("../models/User");
+var extrapolate = new extrap();
 
 //Update Benchmark
 router.post("/:id/upBench", async (req, res) => {
   const { id } = req.params;
   const { score } = req.body;
   try {
+
+    extrapolate.given(1, score[0]);
+    extrapolate.given(2, score[1]);
+    extrapolate.given(3, score[2]);
+    extrapolate.given(4, score[3]);
+    extrapolate.given(5, score[4]);
+
     let user = await User.findByIdAndUpdate(id, {
       $push: { benchmark: score },
+      extrapolater: extrapolate
     });
     user = await User.findById(id);
     res.status(201).send(user);

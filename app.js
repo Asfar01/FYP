@@ -107,6 +107,8 @@ io.sockets.on("connection", function (client) {
         senderName: data.clientName,
         message: "New Task Arrived",
         senderKey: client.id,
+        senderId: data.clientId,
+        senderWalletkey: data.swKey,
         action: data.action,
       });
     } catch (e) {

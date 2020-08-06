@@ -46,6 +46,7 @@ router.post("/uploadTask", async (req, res) => {
           userId: user._id,
           firstName: user.name.firstName,
           benchmark: user.benchmark[user.benchmark.length - 1],
+          extrapolater: user.extrapolater
         });
       }
     }

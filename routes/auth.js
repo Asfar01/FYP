@@ -4,6 +4,7 @@ const { User, validate } = require('../models/User');
 const { Auth } = require('../models/Auth');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const { Wallet } = require('../models/Wallet');
 
 /* Log in */
 router.post('/login', async (req, res, next) => {
@@ -17,7 +18,10 @@ router.post('/login', async (req, res, next) => {
 
 	const user = await User.findById(auth.user_id);
 	if (!user) return res.status(404).send("The user data is missing");
-	const data = { user, username };
+
+	const user_id=auth.user_id
+	const wallet = await Wallet.findOne({user_id})
+	const data = { user, username, wallet};
 
 	const token = jwt.sign({ data }, 'jwtPrivateKey');
 	return res.header('x-auth-token', token).send(data);
