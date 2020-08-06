@@ -42,7 +42,6 @@ router.post("/uploadTask", async (req, res) => {
     for (let i = 0; i < users.length; i++) {
       const thisUser = await User.findById(id);
       const user = await User.findOne({ _id: users[i]._id });
-      console.log("extrapolated values:", user[i].extrapolater)
       if (user && thisUser.email !== user.email) {
         userBenchmarkList.push({
           clientId: users[i].clientId,
@@ -60,7 +59,7 @@ router.post("/uploadTask", async (req, res) => {
         .send({ err: "No users online to serve your task, sad :(" });
     }
     const thisUser = await User.findById(id);
-    bestBenchmark = min(userBenchmarkList, data.number);
+    bestBenchmark = min(userBenchmarkList);
     try {
       task = new Task({
         task_id: task_id,
@@ -87,7 +86,7 @@ router.post("/uploadTask", async (req, res) => {
   }
 });
 
-const min = (items, data) => {
+const min = (items) => {
   let min = items[0];
   for (let i = 0; i < items.length; i++) {
     if (items[i].benchmark < min.benchmark) {
