@@ -15,6 +15,10 @@ const Task = mongoose.model(
       type: String,
       required: true
     },
+    senderWalletKey:{
+      type: String,
+      required: true
+    },
     recipient_id: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,

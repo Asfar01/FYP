@@ -1,4 +1,5 @@
 const express = require("express");
+var extrap = require('extrapolate');
 const router = express.Router();
 const _ = require("lodash");
 const { Wallet } = require("../models/Wallet");
@@ -13,6 +14,7 @@ const { identity } = require("lodash");
 router.post("/uploadTask", async (req, res) => {
   try {
     const { id, task_id, data } = req.body;
+    module.exports.data
     // If the user has enough sikay
     let wallets = await Wallet.find({ user_id: id, flag: true });
     if (!wallets.length) return res.status(404).send("You have no wallet");
@@ -58,12 +60,13 @@ router.post("/uploadTask", async (req, res) => {
         .send({ err: "No users online to serve your task, sad :(" });
     }
     const thisUser = await User.findById(id);
-    bestBenchmark = min(userBenchmarkList);
+    bestBenchmark = min(userBenchmarkList, data.number);
     try {
       task = new Task({
         task_id: task_id,
         sender_id: id,
         senderName: thisUser.name.firstName,
+        senderWalletKey: data.swKey,
         recipient_id: bestBenchmark.userId,
         recipientName: bestBenchmark.firstName,
         status: "Pending",
@@ -84,14 +87,13 @@ router.post("/uploadTask", async (req, res) => {
   }
 });
 
-const min = (items) => {
+const min = (items, data) => {
   let min = items[0];
   for (let i = 0; i < items.length; i++) {
     if (items[i].benchmark < min.benchmark) {
       min = items[i];
     }
   }
-
   return min;
 };
 
