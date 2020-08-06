@@ -7,11 +7,12 @@ const BusyUsers = require("../busyUsers");
 const { User } = require("../models/User");
 const { Task } = require("../models/Task");
 const { io } = require("../app");
+
 const { identity } = require("lodash");
 
 router.post("/uploadTask", async (req, res) => {
   try {
-    const { id, task_id } = req.body;
+    const { id, task_id, data } = req.body;
     // If the user has enough sikay
     let wallets = await Wallet.find({ user_id: id, flag: true });
     if (!wallets.length) return res.status(404).send("You have no wallet");
@@ -66,7 +67,8 @@ router.post("/uploadTask", async (req, res) => {
         recipient_id: bestBenchmark.userId,
         recipientName: bestBenchmark.firstName,
         status: "Pending",
-        type: "PrimeNumber",
+        type: data.type,
+        value: data.number
       });
       await task.save();
       console.log(task);
