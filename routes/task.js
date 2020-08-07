@@ -42,6 +42,7 @@ router.post("/uploadTask", async (req, res) => {
     for (let i = 0; i < users.length; i++) {
       const thisUser = await User.findById(id);
       const user = await User.findOne({ _id: users[i]._id });
+      console.log("extrapolater:", user.extrapolater)
       if (user && thisUser.email !== user.email) {
         userBenchmarkList.push({
           clientId: users[i].clientId,
@@ -88,6 +89,8 @@ router.post("/uploadTask", async (req, res) => {
 
 const min = (items) => {
   let min = items[0];
+  console.log("extrapolaterrrr:", min.extrapolater)
+
   for (let i = 0; i < items.length; i++) {
     if (items[i].benchmark < min.benchmark) {
       min = items[i];

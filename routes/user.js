@@ -2,6 +2,7 @@ var express = require("express");
 var router = express.Router();
 const extrap = require("extrapolate");
 const { User } = require("../models/User");
+const { Wallet } = require("../models/Wallet");
 var extrapolate = new extrap();
 
 //Update Benchmark
@@ -21,7 +22,8 @@ router.post("/:id/upBench", async (req, res) => {
       extrapolater: extrapolate
     });
     user = await User.findById(id);
-    res.status(201).send(user);
+    const wallet = await Wallet.findOne({id})
+    res.status(201).send(user, wallet);
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server Error");
