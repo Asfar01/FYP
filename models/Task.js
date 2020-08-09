@@ -43,8 +43,13 @@ const Task = mongoose.model(
       default: 0
     },
     value: {
-      type: String,
-      required: true
+      linear: {
+        x: { type: Array },
+        y: { type: Array },
+      },
+      prime: {
+        number: {type:Number}
+      }
     }
   })
 );

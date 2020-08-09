@@ -23,7 +23,9 @@ router.post("/:id/upBench", async (req, res) => {
     });
     user = await User.findById(id);
     const wallet = await Wallet.findOne({id})
+    if(wallet)
     res.status(201).send(user, wallet);
+    else res.status(201).send(user);
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server Error");

@@ -115,4 +115,14 @@ router.delete('/deleteWallet', async (req, res) => {
 	}
 });
 
+router.put('/updateWallet', async (req, res) => {
+	try {
+		const {publicKey, balance} = req.body;
+		wallet = await Wallet.findOneAndUpdate({publicKey, flag: true}, { balance: balance }, {new: true});
+		res.status(200).send(wallet)
+	} catch (e) {
+		return res.status(500).send({ err: { message: e.message, code: "ERR_SR" } });
+	}
+})
+
 module.exports = router;

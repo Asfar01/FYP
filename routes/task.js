@@ -1,5 +1,5 @@
 const express = require("express");
-var extrap = require('extrapolate');
+var extrap = require("extrapolate");
 const router = express.Router();
 const _ = require("lodash");
 const { Wallet } = require("../models/Wallet");
@@ -35,21 +35,21 @@ router.post("/uploadTask", async (req, res) => {
     let busy_ = _.values(busyUsers.get());
 
     // filtering the busy users
-    users = _.differenceWith(users, busy_, _.isEqual)
+    users = _.differenceWith(users, busy_, _.isEqual);
 
     let userBenchmarkList = [];
 
     for (let i = 0; i < users.length; i++) {
       const thisUser = await User.findById(id);
       const user = await User.findOne({ _id: users[i]._id });
-      console.log("extrapolater:", user.extrapolater)
+      console.log("extrapolater:", user.extrapolater);
       if (user && thisUser.email !== user.email) {
         userBenchmarkList.push({
           clientId: users[i].clientId,
           userId: user._id,
           firstName: user.name.firstName,
           benchmark: user.benchmark[user.benchmark.length - 1],
-          extrapolater: user.extrapolater
+          extrapolater: user.extrapolater,
         });
       }
     }
@@ -61,6 +61,12 @@ router.post("/uploadTask", async (req, res) => {
     }
     const thisUser = await User.findById(id);
     bestBenchmark = min(userBenchmarkList);
+    const value =
+      data.type == "PrimeNumber"
+        ? {
+            prime: { number: data.number },
+          }
+        : { linear: { x: data.number.x, y: data.number.y } };
     try {
       task = new Task({
         task_id: task_id,
@@ -71,7 +77,7 @@ router.post("/uploadTask", async (req, res) => {
         recipientName: bestBenchmark.firstName,
         status: "Pending",
         type: data.type,
-        value: data.number
+        value: data.number,
       });
       await task.save();
       console.log(task);
@@ -89,8 +95,6 @@ router.post("/uploadTask", async (req, res) => {
 
 const min = (items) => {
   let min = items[0];
-  console.log("extrapolaterrrr:", min.extrapolater)
-
   for (let i = 0; i < items.length; i++) {
     if (items[i].benchmark < min.benchmark) {
       min = items[i];

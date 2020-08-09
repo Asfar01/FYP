@@ -52,6 +52,9 @@ io.sockets.on("connection", function (client) {
         ...data.user,
         clientId: client.id,
       });
+      // io.sockets.connected[data.key].emit("onlineUsers", {
+      //   data: onlineUsers.get(),
+      // });
       console.log("online users", onlineUsers.get());
     }
   });
@@ -62,6 +65,9 @@ io.sockets.on("connection", function (client) {
         ...data.user,
         clientId: client.id,
       });
+      // io.sockets.connected[data.key].emit("busyUsers", {
+      //   data: busyUsers.get(),
+      // });
       console.log("Busy users", busyUsers.get());
     }
   });
