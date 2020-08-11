@@ -1,5 +1,6 @@
 const express = require("express");
 var extrap = require("extrapolate");
+var extrapolate = new extrap();
 const router = express.Router();
 const _ = require("lodash");
 const { Wallet } = require("../models/Wallet");
@@ -42,13 +43,12 @@ router.post("/uploadTask", async (req, res) => {
     for (let i = 0; i < users.length; i++) {
       const thisUser = await User.findById(id);
       const user = await User.findOne({ _id: users[i]._id });
-      console.log("extrapolater:", user.extrapolater);
       if (user && thisUser.email !== user.email) {
         userBenchmarkList.push({
           clientId: users[i].clientId,
           userId: user._id,
           firstName: user.name.firstName,
-          benchmark: user.benchmark[user.benchmark.length - 1],
+          benchmark: user.benchmark,
           extrapolater: user.extrapolater,
         });
       }
@@ -60,7 +60,15 @@ router.post("/uploadTask", async (req, res) => {
         .send({ err: "No users online to serve your task, sad :(" });
     }
     const thisUser = await User.findById(id);
-    bestBenchmark = min(userBenchmarkList);
+    if(data.type == 'PrimeNumber'){
+      if(data.number < 5) bestBenchmark = min(userBenchmarkList);
+      else
+      bestBenchmark= extrapolated(userBenchmarkList, data.number)
+
+    }else{
+      bestBenchmark = min(userBenchmarkList);
+    }
+    console.log("userlist", extrapolated(userBenchmarkList, data.number));
     const value =
       data.type == "PrimeNumber"
         ? {
@@ -77,7 +85,7 @@ router.post("/uploadTask", async (req, res) => {
         recipientName: bestBenchmark.firstName,
         status: "Pending",
         type: data.type,
-        value: data.number,
+        value: value,
       });
       await task.save();
       console.log(task);
@@ -139,16 +147,32 @@ router.get("/userTasks/:user_id", async (req, res) => {
     const { user_id } = req.params;
     let Tasks = [];
     Tasks[0] = await Task.find({ sender_id: user_id });
-    // console.log("Sender task is ", Tasks);
 
     Tasks[1] = await Task.find({ recipient_id: user_id });
-    // console.log("Receiver task is ", Tasks);
-
     res.status(200).send(Tasks);
   } catch (err) {
     console.error(err.message);
     res.status(500).send(err.message);
   }
 });
+
+const extrapolated = (items, value) => {
+  let predictedValues = []
+  for (let i = 0; i < items.length; i++) {
+    let obj = items[i];
+    const { benchmark } = obj;
+    for (let j = 0; j < benchmark.length; j++) {
+      extrapolate.given(j + 1, benchmark[j]); 
+    }
+    predictedValues.push({ex:extrapolate.getLinear(value),user:items[i]})
+  }
+  let minimum = predictedValues[0]
+  for(let i = 0; i < predictedValues.length; i++){
+    if(predictedValues[i].ex < minimum.ex){
+      minimum = predictedValues[i].user
+    }
+  }
+  return minimum;
+};
 
 module.exports = router;
